@@ -8,6 +8,8 @@ from playwright.sync_api import sync_playwright
 from openpyxl import load_workbook
 import os
 import re
+from workstation_funcs import printer_workstation_mapping, get_workstation_lwsids, seen_printer
+import math
 
 sharepoint_url = "https://partnershealthcare.sharepoint.com/sites/IPEDProceduralSpecimenCollectionHardwareWorkgroup"
 
@@ -41,6 +43,10 @@ def main():
     wb = load_workbook(excel_file)
     sheet_ranges = wb[c.sheet_name]
 
+    mappings = printer_workstation_mapping(c.control_id_column, c.workstation_column, sheet_ranges)
+
+    seen = seen_printer(c.control_id_column, c.task_column, sheet_ranges)
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         context = browser.new_context()
@@ -50,23 +56,29 @@ def main():
         excel_page = ExcelPage(context.new_page())
         order_page = OrderPage(context.new_page())
         serial_number_search_page = PrinterSerialSearch(context.new_page())
+        ws_esp = context.new_page()
 
         search_page.load()
         excel_page.load(c.excel_link, c.sheet_name, c.username)
         order_page.load()
         serial_number_search_page.load()
-
-        #xb17afece47ae21102a94f147536d4346 > div > div.div-background > div.panel.panel-default > div:nth-child(4) > a > h5
+        ws_esp.goto("https://partnershealthcare.service-now.com/esp?id=esp_workstations")
 
         for row in range(int(c.start_row), int(c.end_row) + 1):
 
             control_id = sheet_ranges[f"{c.control_id_column}{row}"].value
+            if control_id is None or type(control_id) is not int or cid_len(control_id) != 6:
+                print("Control ID None, not int, not length of 6 skipping...")
+                continue
+            elif control_id in seen:
+                print("Task already made for this printer, skipping...")
             task = sheet_ranges[f"{c.task_column}{row}"].value
             entity = sheet_ranges[f"{c.entity_column}{row}"].value
             room = sheet_ranges[f"{c.room_column}{row}"].value
             epic_dep = sheet_ranges[f"{c.epic_dep_column}{row}"].value
+            workstation = sheet_ranges[f"{c.workstation_column}{row}"].value
 
-            if task is None and control_id is not None and entity is not None and room is not None and epic_dep is not None:
+            if task is None and control_id is not None and entity is not None and room is not None and epic_dep is not None and workstation is not None:
                 print("\n\n")
                 print(f"row {row}: Entity: {entity}, Control ID: {control_id}, Room/cube: {room}, Department: {epic_dep}, Task: {task}")
 
@@ -102,9 +114,13 @@ def main():
                     search_page.search(control_id, asset_tag)
                     search_page.fill_required_fields(control_id, c.location_default, room, entity, epic_dep, printer_model)
 
-                    task = order_page.order_task(control_id, entity, serial_number)
+                    workstations = get_workstation_lwsids(ws_esp, mappings[control_id])
+                    print(workstations)
+                    task = order_page.order_task(control_id, entity, serial_number, workstations)
                     excel_page.set_task(c.task_column, row, task)
+                    seen.add(control_id)
 
+        os.remove(excel_file)
         context.close()
     
     # # df = pd.read_excel("https://partnershealthcare.sharepoint.com/sites/IPEDProceduralSpecimenCollectionHardwareWorkgroup/Shared%20Documents/General/Data%20Collection%20&%20TDR/BWH/BWH_Label%20Printer%20Data%20Collection%20Sheet_Logical%20Mapping.xlsx", "BWH IP_ED_Proc") 
@@ -124,6 +140,12 @@ def printer_model_regex(s: str):
         return match.group(0)
     else:
         return None
+
+def cid_len(n):
+    try:
+        return int(math.log10(n))+1
+    except:
+        return 0
 
 if __name__ == "__main__":
     main()

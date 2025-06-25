@@ -28,6 +28,7 @@ class Controller(slint.loader.ui.app_window.MainWindow):
         self.control_id_column = self.toml["control_id_column"]
         self.task_column = self.toml["task_column"]
         self.epic_dep_column = self.toml["epic_dep_column"]
+        self.workstation_column = self.toml["workstation_column"]
 
     @slint.callback
     def attempt_login(self):
@@ -65,6 +66,7 @@ class Controller(slint.loader.ui.app_window.MainWindow):
                 self.toml.add("control_id_column", self.control_id_column)
                 self.toml.add("task_column", self.task_column)
                 self.toml.add("epic_dep_column", self.epic_dep_column)
+                self.toml.add("workstation_column", self.workstation_column)
                 f.write(dumps(self.toml))
             else:
                 self.toml["username"] = self.username
@@ -78,4 +80,5 @@ class Controller(slint.loader.ui.app_window.MainWindow):
                 self.toml["control_id_column"] = self.control_id_column
                 self.toml["task_column"] = self.task_column
                 self.toml["epic_dep_column"] = self.epic_dep_column
+                self.toml["workstation_column"] = self.workstation_column
                 f.write(dumps(self.toml))

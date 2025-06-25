@@ -26,6 +26,7 @@ export component MainWindow inherits Window {
     in-out property <string> control_id_column;
     in-out property <string> task_column;
     in-out property <string> epic_dep_column;
+    in-out property <string> workstation_column;
 
     callback load_toml();
     callback attempt_login();
@@ -122,6 +123,14 @@ export component MainWindow inherits Window {
                         placeholder-text: "Epic Department column";
                         edited(input) => {
                             root.epic_dep_column = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.workstation_column}";
+                        placeholder-text: "Workstation column";
+                        edited(input) => {
+                            root.workstation_column = input;
                         }
                     }
                 }

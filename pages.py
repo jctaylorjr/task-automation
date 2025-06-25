@@ -87,28 +87,22 @@ class SearchPage:
                 self.page.pause()
     
     def fill_required_fields(self, control_id, location, room, entity, epic_dep, printer_model):
-        self.page.wait_for_timeout(1000)
-        # try:
-            # self.page.locator("#s2id_autogen1").wait_f
+        self.page.wait_for_timeout(2000)
         try:
             # LOCATION FILLED HERE
-            #s2id_location > a > span.select2-arrow
-            # if self.page.locator("#s2id_location > a > abbr").is_visible():
-            #     self.page.locator("#s2id_location > a > abbr").click()
+            print("Filling location...")
             self.page.locator("#s2id_location > a > span.select2-arrow").click(force=True)
             self.page.get_by_role("combobox", name="*Location", exact=True, disabled=False).fill(f"{location}")
             self.page.get_by_role("option", name=f"{location}").first.click()
-            # self.page.get_by_role("combobox", name="*Location", exact=True).click()
-            # self.page.get_by_role("combobox", name="*Location", exact=True).press("Enter")
         except:
             self.page.pause()
 
 
         
         # ROOM FILLED HERE
+        print("Filling Room/Cube...")
         self.page.get_by_role("textbox", name="*Room/Cube").click(force=True)
         self.page.get_by_role("textbox", name="*Room/Cube", disabled=False).fill(f"{room}")
-        # self.page.get_by_role("textbox", name="*Room/Cube").press("Enter")
         
 
         # ENTITY FILLED HERE
@@ -117,6 +111,7 @@ class SearchPage:
         # if self.page.locator("#s2id_epicEntity > a > abbr").is_visible():
         #     self.page.locator("#s2id_epicEntity > a > abbr").click()
         try:
+            print("Filling Epic Entity...")
             self.page.locator("#s2id_epicEntity > a > span.select2-arrow").click(force=True)
             self.page.get_by_role("combobox", name="*Epic Entity", exact=True, disabled=False).fill(f"{entity}")
             self.page.get_by_role("option", name=f"{entity}").first.click(timeout=3000)
@@ -131,6 +126,7 @@ class SearchPage:
         # if self.page.locator("#s2id_epicDepartment > a > abbr").is_visible():
         #     self.page.locator("#s2id_epicDepartment > a > abbr").click()
         try:
+            print("Filling Epic DEP...")
             self.page.locator("#s2id_epicDepartment > a > span.select2-arrow").click(force=True)
             self.page.get_by_role("combobox", name="Epic DEP", exact=True, disabled=False).fill(f"{epic_dep}")
             self.page.get_by_role("option", name=f"{epic_dep}").first.click(timeout=3000)
@@ -145,6 +141,7 @@ class SearchPage:
         # if self.page.locator("#s2id_epicModel > a > abbr").is_visible():
         #     self.page.locator("#s2id_epicModel > a > abbr").click()
         try:
+            print("Filling Epic Printer Model...")
             self.page.locator("#s2id_epicModel > a > span.select2-arrow").click(force=True)
             self.page.get_by_role("combobox", name="*Epic Printer Model", exact=True, disabled=False).fill(f"{printer_model}")
             self.page.get_by_role("option", name=f"{printer_model}").first.click(timeout=3000)
@@ -156,13 +153,15 @@ class SearchPage:
         try:
             #xfb6f0bc6476661102a94f147536d431a > div > div > div.div-container-no-border > p > input
             # self.page.locator("div > div > div.div-container-no-border > p > input").click()
+            print("Updating printer configuration...")
             self.page.get_by_role("button", name="Update Printer Configuration").click(force=True, delay=500)
             locator = self.page.locator("#uiNotificationContainer > div > span").get_by_text("updated!")
             locator.wait_for(state="visible")
-            self.page.get_by_role("button", name="Close Notification").click(delay=100)
+            for button in self.page.get_by_role("button", name="Close Notification").all():
+                button.click()
         except:
             # print("couldnt wait for config ID invalid reference!")
-            print("Please check order page to ensure that the task was updated and submitted. Press green arrow in debug menu to continue task creation...")
+            print("Please check order page to ensure that the printer configuration was updated. Press green arrow in debug menu to continue task creation...")
             self.page.pause()
 
     def get_epic_entity(self) -> Optional[str]:
@@ -191,7 +190,7 @@ class OrderPage:
             "https://partnershealthcare.service-now.com/now/nav/ui/classic/params/target/home.do"
         )
 
-    def order_task(self, control_id, entity, serial_number) -> str:
+    def order_task(self, control_id, entity, serial_number, workstations) -> str:
         self.reset_to_new_request()
 
         # Pressing order ticket button and copying TASK#
@@ -227,7 +226,10 @@ class OrderPage:
         
         # Entering filled out description with entity, control id, and serial number
         print(f"Filling description...")
-        description = f"Request Epic EPR and LRS build for the following Beaker Specimen Label Printer:\nEntity: {entity}\nControl #: {control_id}\nSerial #: {serial_number}\n*To be configured for Wi-Fi and Hostname will need to be updated via PPME"
+        map_request = ""
+        if len(workstations) > 0:
+            map_request = f"\nPlease map the following workstations to this printer: {", ".join(workstations)}"
+        description = f"Request Epic EPR and LRS build for the following Beaker Specimen Label Printer:\nEntity: {entity}\nControl #: {control_id}\nSerial #: {serial_number}\n*To be configured for Wi-Fi and Hostname will need to be updated via PPME{map_request}"
         self.page.locator('iframe[name="gsft_main"]').content_frame.get_by_role(
             "textbox",
             name=" Field value has changed since last updateDescription  Search Knowledge To",
