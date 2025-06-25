@@ -1,0 +1,51 @@
+import {Button, VerticalBox, HorizontalBox, LineEdit} from "std-widgets.slint";
+
+// export struct Settings {
+//     excel_link_input: string,
+//     sheet_name_input: string,
+//     start_row_input: string,
+//     end_row_input: string,
+//     entity_column_input: string,
+//     control_id_column_input: string,
+//     task_column_input: string,
+// }
+
+export component MainWindow inherits Window {
+    preferred-height: 100px;
+    preferred-width: 400px;
+
+    in-out property <string> username_input;
+    out property <string> password_input;
+
+    callback load_toml();
+    callback attempt_login(username_input: string, password_input: string);
+
+        GridLayout {
+            VerticalBox {
+                HorizontalBox {
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.username_input}";
+                        placeholder-text: "Username";
+                        edited(input) => {
+                            root.username_input = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: InputType.password;
+                        placeholder-text: "Password";
+                        edited(input) => {
+                            root.password_input = input;
+                        }
+                        key-pressed(event) => {
+                            if (event.text == Key.Return) {
+                                attempt_login(root.username_input, root.password_input);
+                                accept;
+                            }
+                            reject;
+                        }
+                    }
+                }
+            }
+        }
+}

@@ -1,0 +1,156 @@
+import {Button, VerticalBox, HorizontalBox, LineEdit} from "std-widgets.slint";
+
+// export struct Settings {
+//     excel_link: string,
+//     sheet_name: string,
+//     start_row: string,
+//     end_row: string,
+//     entity_column: string,
+//     control_id_column: string,
+//     task_column: string,
+// }
+
+export component MainWindow inherits Window {
+    preferred-height: 100px;
+    preferred-width: 400px;
+
+    in-out property <string> username;
+    out property <string> password;
+    in-out property <string> excel_link;
+    in-out property <string> sheet_name;
+    in-out property <string> start_row;
+    in-out property <string> end_row;
+    in-out property <string> location_default;
+    in-out property <string> room_column;
+    in-out property <string> entity_column;
+    in-out property <string> control_id_column;
+    in-out property <string> task_column;
+    in-out property <string> epic_dep_column;
+
+    callback load_toml();
+    callback attempt_login();
+
+        GridLayout {
+            VerticalBox {
+                HorizontalBox {
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.username}";
+                        placeholder-text: "Username";
+                        edited(input) => {
+                            root.username = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: InputType.password;
+                        placeholder-text: "Password";
+                        edited(input) => {
+                            root.password = input;
+                        }
+                        key-pressed(event) => {
+                            if (event.text == Key.Return) {
+                                root.attempt_login();
+                                accept;
+                            }
+                            reject;
+                        }
+                    }
+                }
+                
+                VerticalBox {
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.excel_link}";
+                        placeholder-text: "Link to excel file";
+                        edited(input) => {
+                            root.excel_link = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.sheet_name}";
+                        placeholder-text: "Sheet name";
+                        edited(input) => {
+                            root.sheet_name = input;
+                        }
+                    }
+                }
+                HorizontalBox {
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.location_default}";
+                        placeholder-text: "Location default";
+                        edited(input) => {
+                            root.location_default = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.room_column}";
+                        placeholder-text: "Room column";
+                        edited(input) => {
+                            root.room_column = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.entity_column}";
+                        placeholder-text: "Entity column";
+                        edited(input) => {
+                            root.entity_column = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.control_id_column}";
+                        placeholder-text: "Control ID column";
+                        edited(input) => {
+                            root.control_id_column = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.task_column}";
+                        placeholder-text: "Task column";
+                        edited(input) => {
+                            root.task_column = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.epic_dep_column}";
+                        placeholder-text: "Epic Department column";
+                        edited(input) => {
+                            root.epic_dep_column = input;
+                        }
+                    }
+                }
+                HorizontalBox {
+                    LineEdit {
+                        input-type: number;
+                        text: "\{root.start_row}";
+                        placeholder-text: "Start row";
+                        edited(input) => {
+                            root.start_row = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: number;
+                        text: "\{root.end_row}";
+                        placeholder-text: "Stop row";
+                        edited(input) => {
+                            root.end_row = input;
+                        }
+                    }
+                }
+                HorizontalBox {
+                    Button {
+                        text: "Login";
+                        clicked => {
+                            root.attempt_login()
+                        }
+                    }
+                }
+            }
+        }
+}
