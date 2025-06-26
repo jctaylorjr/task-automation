@@ -35,6 +35,11 @@ def main():
     else:
         print('Authenticated into sharepoint as: ',web.properties['Title'])
 
+    if os.path.isfile("task_log.csv") != True:
+        with open('task_log.csv', mode='a') as file:
+            file.write("Date,Printer Control ID,Task,Serial Number,Asset Tag,Printer Model,Epic Entity,Location,Room,Department,Workstations,Workbook,Sheet,Row\n")
+
+
     excel_file = os.path.basename(unquote(c.excel_file_path))
     print(f"File name: {excel_file}")
 
@@ -129,7 +134,7 @@ def main():
                     excel_page.set_task(c.task_column, row, task)
                     seen.add(control_id)
                     with open('task_log.csv', mode='a') as file:
-                        file.write(f"\n{datetime.now(tzinfo)}, {control_id}, {task}, {serial_number}, {asset_tag}, {fields["printer_model"]}, {fields["entity"]}, {fields["location"]}, {room}, {fields["epic_dep"]}, {workstations}, {excel_file}, {c.sheet_name}, {row}")
+                        file.write(f"{datetime.now(tzinfo)},{control_id},{task},{serial_number},{asset_tag},{fields["printer_model"]},{fields["entity"]},{fields["location"]},{room},{fields["epic_dep"]},{workstations},{excel_file},{c.sheet_name},{row}\n")
 
         os.remove(excel_file)
         context.close()
