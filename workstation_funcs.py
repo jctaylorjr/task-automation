@@ -15,6 +15,7 @@ def get_workstation_lwsids(page: Page, ws_names):
             page.locator("#wkstaSearch").click()
             response = response_info.value
             if response.ok:
+                ws_name_lwsid = f"{ws} [Not found]"
                 try:
                     # ws_name_lwsid = response.json()["result"]["data"]["lws"]["searchList"][0]["displayValue"]
                     workstations = response.json()["result"]["data"]["lws"]["searchList"]
@@ -22,10 +23,6 @@ def get_workstation_lwsids(page: Page, ws_names):
                         if d["name"] == ws:
                             ws_name_lwsid = d["displayValue"]
                             break
-                        else:
-                            ws_name_lwsid = f"{ws} [Not found]"
-                except:
-                    ws_name_lwsid = f"{ws} [Not found]"
                 finally:
                     ws_name_lwsids.append(ws_name_lwsid)
     return ws_name_lwsids
