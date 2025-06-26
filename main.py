@@ -129,7 +129,7 @@ def main():
                     excel_page.set_task(c.task_column, row, task)
                     seen.add(control_id)
                     with open('task_log.csv', mode='a') as file:
-                        file.write(f"{datetime.now(tzinfo)}, {control_id}, {task}, {serial_number}, {asset_tag}, {fields["printer_model"]}, {fields["entity"]}, {fields["location"]}, {room}, {fields["epic_dep"]}, {workstations}, {excel_file}, {c.sheet_name}, {row}")
+                        file.write(f"\n{datetime.now(tzinfo)}, {control_id}, {task}, {serial_number}, {asset_tag}, {fields["printer_model"]}, {fields["entity"]}, {fields["location"]}, {room}, {fields["epic_dep"]}, {workstations}, {excel_file}, {c.sheet_name}, {row}")
 
         os.remove(excel_file)
         context.close()
