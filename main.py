@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright
 from openpyxl import load_workbook
 import os
 import re
-from workstation_funcs import get_workstation_lwsids
+from workstation_funcs import get_workstation_lwsids, format_workstation, is_valid_workstation
 from mapping import printer_workstation_mapping, seen_printer, find_printer_tasks, map_printers_workstations_tasks
 import math
 from datetime import datetime, timezone, timedelta
@@ -56,7 +56,7 @@ def main():
     # seen = seen_printer(c.control_id_column, c.task_column, sheet_ranges)
     # printer_tasks = find_printer_tasks(c.control_id_column, c.task_column, sheet_ranges)
 
-    timezone_offset = -5.0  # EST (UTC−05:00)
+    timezone_offset = -4.0  # EST (UTC−04:00) Daylight Savings time 
     tzinfo = timezone(timedelta(hours=timezone_offset))
 
     with sync_playwright() as p:
@@ -82,11 +82,17 @@ def main():
             if control_id is None or type(control_id) is not int or cid_len(control_id) != 6:
                 print("Control ID None, not int, not length of 6 skipping...")
                 continue
+
+            workstation = sheet_ranges[f"{c.workstation_column}{row}"].value
+            workstation = format_workstation(workstation)
+            if is_valid_workstation(workstation) == False:
+                continue
+
             task = sheet_ranges[f"{c.task_column}{row}"].value
             entity = sheet_ranges[f"{c.entity_column}{row}"].value
             room = sheet_ranges[f"{c.room_column}{row}"].value
             epic_dep = sheet_ranges[f"{c.epic_dep_column}{row}"].value
-            workstation = sheet_ranges[f"{c.workstation_column}{row}"].value
+
 
             if task is None and control_id is not None and entity is not None and room is not None and epic_dep is not None and workstation is not None:
                 print("\n\n")
