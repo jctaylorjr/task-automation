@@ -35,3 +35,24 @@ def printer_workstation_mapping(control_id_column, workstation_column, sheet_ran
         printer_to_workstations[control_id].append(str(workstation))
 
     return printer_to_workstations
+
+
+def map_printers_workstations_tasks(control_id_column, workstation_column, task_column, sheet_ranges):
+    seen_printers = set()
+    printer_to_workstations = defaultdict(list)
+    printer_tasks = defaultdict(list)
+
+    for row in range(2, sheet_ranges.max_row + 1):
+        control_id = sheet_ranges[f"{control_id_column}{row}"].value
+        workstation = sheet_ranges[f"{workstation_column}{row}"].value
+        task = sheet_ranges[f"{task_column}{row}"].value
+
+        if control_id is not None:
+            if task is not None:
+                printer_tasks[control_id] = task
+                if control_id not in seen_printers:
+                    seen_printers.add(control_id)
+            if workstation is not None:
+                printer_to_workstations[control_id].append(str(workstation))
+
+    return seen_printers, printer_to_workstations, printer_tasks
