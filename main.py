@@ -70,8 +70,6 @@ def main():
             if control_id is None or type(control_id) is not int or cid_len(control_id) != 6:
                 print("Control ID None, not int, not length of 6 skipping...")
                 continue
-            elif control_id in seen:
-                print("Task already made for this printer, skipping...")
             task = sheet_ranges[f"{c.task_column}{row}"].value
             entity = sheet_ranges[f"{c.entity_column}{row}"].value
             room = sheet_ranges[f"{c.room_column}{row}"].value
@@ -81,6 +79,9 @@ def main():
             if task is None and control_id is not None and entity is not None and room is not None and epic_dep is not None and workstation is not None:
                 print("\n\n")
                 print(f"row {row}: Entity: {entity}, Control ID: {control_id}, Room/cube: {room}, Department: {epic_dep}, Task: {task}")
+                if control_id in seen:
+                    print("Task already made for this printer, skipping...")
+                    continue
 
 
                 print("Searching control ID on servicenow...", end=" ", flush=True)
