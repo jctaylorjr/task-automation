@@ -8,7 +8,8 @@ from playwright.sync_api import sync_playwright
 from openpyxl import load_workbook
 import os
 import re
-from workstation_funcs import printer_workstation_mapping, get_workstation_lwsids, seen_printer
+from workstation_funcs import get_workstation_lwsids
+from mapping import printer_workstation_mapping, seen_printer, find_printer_tasks
 import math
 
 sharepoint_url = "https://partnershealthcare.sharepoint.com/sites/IPEDProceduralSpecimenCollectionHardwareWorkgroup"
@@ -44,8 +45,8 @@ def main():
     sheet_ranges = wb[c.sheet_name]
 
     mappings = printer_workstation_mapping(c.control_id_column, c.workstation_column, sheet_ranges)
-
     seen = seen_printer(c.control_id_column, c.task_column, sheet_ranges)
+    printer_tasks = find_printer_tasks(c.control_id_column, c.task_column, sheet_ranges)
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
@@ -80,7 +81,10 @@ def main():
                 print("\n\n")
                 print(f"row {row}: Entity: {entity}, Control ID: {control_id}, Room/cube: {room}, Department: {epic_dep}, Task: {task}")
                 if control_id in seen:
-                    print("Task already made for this printer, skipping...")
+                    print("Task already made for this printer...")
+                    task = printer_tasks[control_id]
+                    print("Filling in associated ticket...", end="", flush=True)
+                    excel_page.set_task(c.task_column, row, task)
                     continue
 
 

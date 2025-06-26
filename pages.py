@@ -90,19 +90,25 @@ class SearchPage:
         self.page.wait_for_timeout(2000)
         try:
             # LOCATION FILLED HERE
-            print("Filling location...")
+            print("Filling location...", end=" ", flush=True)
             self.page.locator("#s2id_location > a > span.select2-arrow").click(force=True)
             self.page.get_by_role("combobox", name="*Location", exact=True, disabled=False).fill(f"{location}")
             self.page.get_by_role("option", name=f"{location}").first.click()
         except:
             self.page.pause()
+        else:
+            try:
+                print(f"{self.page.locator("#select2-chosen-4").input_value(timeout=100)}")
+            except:
+                print(f"{location}")
 
 
         
         # ROOM FILLED HERE
-        print("Filling Room/Cube...")
+        print("Filling Room/Cube...", end=" ", flush=True)
         self.page.get_by_role("textbox", name="*Room/Cube").click(force=True)
         self.page.get_by_role("textbox", name="*Room/Cube", disabled=False).fill(f"{room}")
+        print(f"{room}")
         
 
         # ENTITY FILLED HERE
@@ -111,12 +117,18 @@ class SearchPage:
         # if self.page.locator("#s2id_epicEntity > a > abbr").is_visible():
         #     self.page.locator("#s2id_epicEntity > a > abbr").click()
         try:
-            print("Filling Epic Entity...")
+            print("Filling Epic Entity...", end=" ", flush=True)
             self.page.locator("#s2id_epicEntity > a > span.select2-arrow").click(force=True)
             self.page.get_by_role("combobox", name="*Epic Entity", exact=True, disabled=False).fill(f"{entity}")
             self.page.get_by_role("option", name=f"{entity}").first.click(timeout=3000)
         except:
             self.page.pause()
+        else:
+            try:
+                print(f"{self.page.locator("#select2-chosen-6").input_value(timeout=100)}")
+            except:
+                print(f"{entity}")
+
         # self.page.get_by_role("combobox", name="*Epic Entity", exact=True).press("Enter", delay=2000)
         # self.page.get_by_role("link", name="BWH PRE/PACU (10030010422) Clear field x_pahcs_edm_epic_dep").click()
 
@@ -126,12 +138,18 @@ class SearchPage:
         # if self.page.locator("#s2id_epicDepartment > a > abbr").is_visible():
         #     self.page.locator("#s2id_epicDepartment > a > abbr").click()
         try:
-            print("Filling Epic DEP...")
+            print("Filling Epic DEP...", end=" ", flush=True)
             self.page.locator("#s2id_epicDepartment > a > span.select2-arrow").click(force=True)
             self.page.get_by_role("combobox", name="Epic DEP", exact=True, disabled=False).fill(f"{epic_dep}")
             self.page.get_by_role("option", name=f"{epic_dep}").first.click(timeout=3000)
+            print(f"{self.page.locator("#select2-chosen-8").input_value()}")
         except:
             self.page.pause()
+        else:
+            try:
+                print(f"{self.page.locator("#select2-chosen-8").input_value(timeout=100)}")
+            except:
+                print(f"{epic_dep}")
         # self.page.get_by_role("combobox", name="Epic DEP", exact=True).press("Enter", delay=2000)
 
 
@@ -141,12 +159,18 @@ class SearchPage:
         # if self.page.locator("#s2id_epicModel > a > abbr").is_visible():
         #     self.page.locator("#s2id_epicModel > a > abbr").click()
         try:
-            print("Filling Epic Printer Model...")
+            print("Filling Epic Printer Model...", end=" ", flush=True)
             self.page.locator("#s2id_epicModel > a > span.select2-arrow").click(force=True)
             self.page.get_by_role("combobox", name="*Epic Printer Model", exact=True, disabled=False).fill(f"{printer_model}")
             self.page.get_by_role("option", name=f"{printer_model}").first.click(timeout=3000)
         except:
             self.page.pause()
+        else:
+            try:
+                print(f"{self.page.locator("#select2-chosen-9").input_value(timeout=100)}")
+            except:
+                print(f"{printer_model}")
+
         # self.page.get_by_role("combobox", name="*Epic Printer Model", exact=True).press("Enter", delay=2000)
 
         # updates printer button, wait for success banner to confirm update went through and closes banner to not trigger again when searching for another printer
