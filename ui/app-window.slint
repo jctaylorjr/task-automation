@@ -27,6 +27,7 @@ export component MainWindow inherits Window {
     in-out property <string> task_column;
     in-out property <string> epic_dep_column;
     in-out property <string> workstation_column;
+    in-out property <string> location_column;
 
     callback load_toml();
     callback attempt_login();
@@ -131,6 +132,14 @@ export component MainWindow inherits Window {
                         placeholder-text: "Workstation column";
                         edited(input) => {
                             root.workstation_column = input;
+                        }
+                    }
+                    LineEdit {
+                        input-type: text;
+                        text: "\{root.location_column}";
+                        placeholder-text: "Location column";
+                        edited(input) => {
+                            root.location_column = input;
                         }
                     }
                 }

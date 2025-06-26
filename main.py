@@ -86,12 +86,17 @@ def main():
             workstation = sheet_ranges[f"{c.workstation_column}{row}"].value
             workstation = format_workstation(workstation)
             if is_valid_workstation(workstation) == False:
+                print("Not a valid workstation, skipping...\n\n")
                 continue
 
             task = sheet_ranges[f"{c.task_column}{row}"].value
             entity = sheet_ranges[f"{c.entity_column}{row}"].value
             room = sheet_ranges[f"{c.room_column}{row}"].value
             epic_dep = sheet_ranges[f"{c.epic_dep_column}{row}"].value
+            location = sheet_ranges[f"{c.location_column}{row}"].value
+            if location is None:
+                print("Not a valid location, skipping...\n\n")
+                continue
 
 
             if task is None and control_id is not None and entity is not None and room is not None and epic_dep is not None and workstation is not None:
@@ -134,7 +139,7 @@ def main():
 
                 if serial_number is not None and asset_tag is not None:
                     search_page.search(control_id, asset_tag)
-                    fields = search_page.fill_required_fields(control_id, c.location_default, room, entity, epic_dep, printer_model)
+                    fields = search_page.fill_required_fields(control_id, location, room, entity, epic_dep, printer_model)
 
                     workstations = get_workstation_lwsids(ws_esp, mappings[control_id])
                     print(workstations)

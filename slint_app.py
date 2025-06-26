@@ -22,13 +22,13 @@ class Controller(slint.loader.ui.app_window.MainWindow):
         self.sheet_name = self.toml["sheet_name"]
         self.start_row = self.toml["start_row"]
         self.end_row = self.toml["end_row"]
-        self.location_default = self.toml["location_default"]
         self.room_column = self.toml["room_column"]
         self.entity_column = self.toml["entity_column"]
         self.control_id_column = self.toml["control_id_column"]
         self.task_column = self.toml["task_column"]
         self.epic_dep_column = self.toml["epic_dep_column"]
         self.workstation_column = self.toml["workstation_column"]
+        self.location_column = self.toml["location_column"]
 
     @slint.callback
     def attempt_login(self):
@@ -60,13 +60,13 @@ class Controller(slint.loader.ui.app_window.MainWindow):
                 self.toml.add("sheet_name", self.sheet_name)
                 self.toml.add("start_row", self.start_row)
                 self.toml.add("end_row", self.end_row)
-                self.toml.add("location_default", self.location_default)
                 self.toml.add("room_column", self.room_column)
                 self.toml.add("entity_column", self.entity_column)
                 self.toml.add("control_id_column", self.control_id_column)
                 self.toml.add("task_column", self.task_column)
                 self.toml.add("epic_dep_column", self.epic_dep_column)
                 self.toml.add("workstation_column", self.workstation_column)
+                self.toml.add("location_column", self.location_column)
                 f.write(dumps(self.toml))
             else:
                 self.toml["username"] = self.username
@@ -74,11 +74,11 @@ class Controller(slint.loader.ui.app_window.MainWindow):
                 self.toml["sheet_name"] = self.sheet_name
                 self.toml["start_row"] = self.start_row
                 self.toml["end_row"] = self.end_row
-                self.toml["location_default"] = self.location_default
                 self.toml["room_column"] = self.room_column
                 self.toml["entity_column"] = self.entity_column
                 self.toml["control_id_column"] = self.control_id_column
                 self.toml["task_column"] = self.task_column
                 self.toml["epic_dep_column"] = self.epic_dep_column
                 self.toml["workstation_column"] = self.workstation_column
+                self.toml["location_column"] = self.location_column
                 f.write(dumps(self.toml))
