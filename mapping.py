@@ -6,9 +6,9 @@ def find_printer_tasks(control_id_column, task_column, sheet_ranges):
     for row in range(2, sheet_ranges.max_row + 1):
         control_id = sheet_ranges[f"{control_id_column}{row}"].value
         task = sheet_ranges[f"{task_column}{row}"].value
-        if control_id is None or task is not None:
+        if control_id is None or task is None:
             continue
-        printer_tasks[control_id].append(task)
+        printer_tasks[control_id] = task
 
     return printer_tasks
 

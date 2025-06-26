@@ -1,13 +1,24 @@
+from collections import defaultdict
+from openpyxl import load_workbook
+from mapping import find_printer_tasks
 
-# wb = load_workbook("MGH_Label Printer Data Collection Sheet_Logical Mapping-testing.xlsx")
-# sheet_ranges = wb["Data Collection Sheet"]
+wb = load_workbook("MGH_Label Printer Data Collection Sheet_Logical Mapping.xlsx")
+sheet_ranges = wb["Data Collection Sheet"]
+
+print(type(sheet_ranges["P1323"]))
+print(type(sheet_ranges["P1323"].value))
+print(sheet_ranges["P1323"].value)
+
+tasks = find_printer_tasks("C", "P", sheet_ranges)
+print(tasks[736720])
+
 # mappings = printer_workstation_mapping("C", "B", sheet_ranges)
-# # print(mappings[738213])
-# # print_workstations(mappings[738213])
-# # print(printer_to_workstations.get(702772))
+# print(mappings[738213])
+# print_workstations(mappings[738213])
+# print(printer_to_workstations.get(702772))
 # for mapping, values in mappings.items():
 #     print(f"{mapping}({len(values)}): {" ".join(values)}")
-#     # print_workstations(values)
+    # print_workstations(values)
 
 # seen = seen_printer("C", "B", sheet_ranges)
 # print(seen)
