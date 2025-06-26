@@ -86,7 +86,7 @@ class SearchPage:
                 print("Make sure all fields are filled out before unpausing")
                 self.page.pause()
     
-    def fill_required_fields(self, control_id, location, room, entity, epic_dep, printer_model):
+    def fill_required_fields(self, control_id, location, room, entity, epic_dep, printer_model) -> dict:
         self.page.wait_for_timeout(2000)
         try:
             # LOCATION FILLED HERE
@@ -98,9 +98,9 @@ class SearchPage:
             self.page.pause()
         else:
             try:
-                print(f"{self.page.locator("#select2-chosen-4").inner_text(timeout=1000)}")
-            except:
-                print(f"{location}")
+                location = self.page.locator("#select2-chosen-4").inner_text(timeout=1000)
+            finally:
+                print(location)
 
 
         
@@ -108,7 +108,7 @@ class SearchPage:
         print("Filling Room/Cube...", end=" ", flush=True)
         self.page.get_by_role("textbox", name="*Room/Cube").click(force=True)
         self.page.get_by_role("textbox", name="*Room/Cube", disabled=False).fill(f"{room}")
-        print(f"{room}")
+        print(room)
         
 
         # ENTITY FILLED HERE
@@ -125,9 +125,9 @@ class SearchPage:
             self.page.pause()
         else:
             try:
-                print(f"{self.page.locator("#select2-chosen-6").inner_text(timeout=1000)}")
-            except:
-                print(f"{entity}")
+                entity = self.page.locator("#select2-chosen-6").inner_text(timeout=1000)
+            finally:
+                print(entity)
 
         # self.page.get_by_role("combobox", name="*Epic Entity", exact=True).press("Enter", delay=2000)
         # self.page.get_by_role("link", name="BWH PRE/PACU (10030010422) Clear field x_pahcs_edm_epic_dep").click()
@@ -146,8 +146,8 @@ class SearchPage:
             self.page.pause()
         else:
             try:
-                print(f"{self.page.locator("#select2-chosen-8").inner_text(timeout=1000)}")
-            except:
+                epic_dep = self.page.locator("#select2-chosen-8").inner_text(timeout=1000)
+            finally:
                 print(f"{epic_dep}")
         # self.page.get_by_role("combobox", name="Epic DEP", exact=True).press("Enter", delay=2000)
 
@@ -166,8 +166,8 @@ class SearchPage:
             self.page.pause()
         else:
             try:
-                print(f"{self.page.locator("#select2-chosen-9").inner_text(timeout=1000)}")
-            except:
+                printer_model = self.page.locator("#select2-chosen-9").inner_text(timeout=1000)
+            finally:
                 print(f"{printer_model}")
 
         # self.page.get_by_role("combobox", name="*Epic Printer Model", exact=True).press("Enter", delay=2000)
@@ -186,6 +186,8 @@ class SearchPage:
             # print("couldnt wait for config ID invalid reference!")
             print("Please check order page to ensure that the printer configuration was updated. Press green arrow in debug menu to continue task creation...")
             self.page.pause()
+
+        return {"location": location, "entity": entity, "epic_dep": epic_dep, "printer_model": printer_model}
 
     def get_epic_entity(self) -> Optional[str]:
         entity = None

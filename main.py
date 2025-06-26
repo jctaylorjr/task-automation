@@ -11,6 +11,7 @@ import re
 from workstation_funcs import get_workstation_lwsids
 from mapping import printer_workstation_mapping, seen_printer, find_printer_tasks
 import math
+from datetime import datetime, timezone, timedelta
 
 sharepoint_url = "https://partnershealthcare.sharepoint.com/sites/IPEDProceduralSpecimenCollectionHardwareWorkgroup"
 
@@ -47,6 +48,9 @@ def main():
     mappings = printer_workstation_mapping(c.control_id_column, c.workstation_column, sheet_ranges)
     seen = seen_printer(c.control_id_column, c.task_column, sheet_ranges)
     printer_tasks = find_printer_tasks(c.control_id_column, c.task_column, sheet_ranges)
+
+    timezone_offset = -5.0  # Pacific Standard Time (UTC−08:00)
+    tzinfo = timezone(timedelta(hours=timezone_offset))
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
@@ -117,13 +121,15 @@ def main():
 
                 if serial_number is not None and asset_tag is not None:
                     search_page.search(control_id, asset_tag)
-                    search_page.fill_required_fields(control_id, c.location_default, room, entity, epic_dep, printer_model)
+                    fields = search_page.fill_required_fields(control_id, c.location_default, room, entity, epic_dep, printer_model)
 
                     workstations = get_workstation_lwsids(ws_esp, mappings[control_id])
                     print(workstations)
                     task = order_page.order_task(control_id, entity, serial_number, workstations)
                     excel_page.set_task(c.task_column, row, task)
                     seen.add(control_id)
+                    with open('task_log.csv', mode='a') as file:
+                        file.write(f"{datetime.now(tzinfo)}, {control_id}, {task}, {serial_number}, {asset_tag}, {fields["printer_modedl"]}, {fields["entity"]}, {fields["location"]}, {room}, {fields["epic_dep"]}, {workstations}, {excel_file}, {c.sheet_name}, {row}")
 
         os.remove(excel_file)
         context.close()
