@@ -98,7 +98,7 @@ class SearchPage:
             self.page.pause()
         else:
             try:
-                print(f"{self.page.locator("#select2-chosen-4").input_value(timeout=100)}")
+                print(f"{self.page.locator("#select2-chosen-4").inner_text(timeout=1000)}")
             except:
                 print(f"{location}")
 
@@ -125,7 +125,7 @@ class SearchPage:
             self.page.pause()
         else:
             try:
-                print(f"{self.page.locator("#select2-chosen-6").input_value(timeout=100)}")
+                print(f"{self.page.locator("#select2-chosen-6").inner_text(timeout=1000)}")
             except:
                 print(f"{entity}")
 
@@ -142,12 +142,11 @@ class SearchPage:
             self.page.locator("#s2id_epicDepartment > a > span.select2-arrow").click(force=True)
             self.page.get_by_role("combobox", name="Epic DEP", exact=True, disabled=False).fill(f"{epic_dep}")
             self.page.get_by_role("option", name=f"{epic_dep}").first.click(timeout=3000)
-            print(f"{self.page.locator("#select2-chosen-8").input_value()}")
         except:
             self.page.pause()
         else:
             try:
-                print(f"{self.page.locator("#select2-chosen-8").input_value(timeout=100)}")
+                print(f"{self.page.locator("#select2-chosen-8").inner_text(timeout=1000)}")
             except:
                 print(f"{epic_dep}")
         # self.page.get_by_role("combobox", name="Epic DEP", exact=True).press("Enter", delay=2000)
@@ -167,7 +166,7 @@ class SearchPage:
             self.page.pause()
         else:
             try:
-                print(f"{self.page.locator("#select2-chosen-9").input_value(timeout=100)}")
+                print(f"{self.page.locator("#select2-chosen-9").inner_text(timeout=1000)}")
             except:
                 print(f"{printer_model}")
 
