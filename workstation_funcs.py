@@ -25,7 +25,8 @@ def get_workstation_lwsids(page: Page, ws_names):
     return ws_name_lwsids
 
 def format_workstation(ws):
-    ws = ws.strip()
+    if type(ws) is str:
+        ws = ws.strip()
     if type(ws) is int:
         ws = f"W0{str(ws)}"
     return ws
