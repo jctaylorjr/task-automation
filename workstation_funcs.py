@@ -9,19 +9,21 @@ def get_workstation_lwsids(page: Page, ws_names):
         with page.expect_response("https://partnershealthcare.service-now.com/api/now/sp/rectangle/ddd076c2473b39d02a94f147536d4327?id=esp_workstations") as response_info:
             page.locator("#wkstaSearch").click()
             response = response_info.value
-            if response.ok:
-                ws_name_lwsid = f"{ws} [Not found]"
-                try:
-                    # ws_name_lwsid = response.json()["result"]["data"]["lws"]["searchList"][0]["displayValue"]
-                    workstations = response.json()["result"]["data"]["lws"]["searchList"]
-                    if len(workstations) == 1:
-                        ws_name_lwsid = workstations[0]["displayValue"]
-                    for d in workstations:
-                        if d["name"] == ws:
-                            ws_name_lwsid = d["displayValue"]
-                            break
-                finally:
-                    ws_name_lwsids.append(ws_name_lwsid)
+        if response.ok:
+            ws_name_lwsid = f"{ws} [Not found]"
+            try:
+                # ws_name_lwsid = response.json()["result"]["data"]["lws"]["searchList"][0]["displayValue"]
+                workstations = response.json()["result"]["data"]["lws"]["searchList"]
+                if len(workstations) == 1:
+                    ws_name_lwsid = workstations[0]["displayValue"]
+                for d in workstations:
+                    if d["name"] == ws:
+                        ws_name_lwsid = d["displayValue"]
+                        break
+            except:
+                print("failed to get workstation from response...")
+            finally:
+                ws_name_lwsids.append(ws_name_lwsid)
     return ws_name_lwsids
 
 def format_workstation(ws):
