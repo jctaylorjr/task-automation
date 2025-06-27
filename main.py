@@ -85,7 +85,7 @@ def main():
 
             workstation = sheet_ranges[f"{c.workstation_column}{row}"].value
             workstation = format_workstation(workstation)
-            if is_valid_workstation(workstation) == False:
+            if is_valid_workstation(workstation) is False:
                 continue
 
             task = sheet_ranges[f"{c.task_column}{row}"].value

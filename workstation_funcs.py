@@ -14,6 +14,8 @@ def get_workstation_lwsids(page: Page, ws_names):
                 try:
                     # ws_name_lwsid = response.json()["result"]["data"]["lws"]["searchList"][0]["displayValue"]
                     workstations = response.json()["result"]["data"]["lws"]["searchList"]
+                    if len(workstations) == 1:
+                        ws_name_lwsid = workstations[0]["displayValue"]
                     for d in workstations:
                         if d["name"] == ws:
                             ws_name_lwsid = d["displayValue"]
@@ -23,8 +25,10 @@ def get_workstation_lwsids(page: Page, ws_names):
     return ws_name_lwsids
 
 def format_workstation(ws):
+    ws.strip()
     if type(ws) is int:
         ws = f"W0{str(ws)}"
+    return ws
 
 def is_valid_workstation(ws):
     # 8 for W0253604 and 10 for DIMFLH2664
