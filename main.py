@@ -85,7 +85,7 @@ def main():
 
             workstation = sheet_ranges[f"{c.workstation_column}{row}"].value
             workstation = format_workstation(workstation)
-            if is_valid_workstation(workstation) == False:
+            if is_valid_workstation(workstation) is False:
                 print("Not a valid workstation, skipping...\n\n")
                 continue
 
