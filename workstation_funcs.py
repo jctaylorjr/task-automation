@@ -16,14 +16,16 @@ def get_workstation_lwsids(page: Page, ws_names):
                 workstations = response.json()["result"]["data"]["lws"]["searchList"]
                 if len(workstations) == 1:
                     ws_name_lwsid = workstations[0]["displayValue"]
-                else:
-                    for d in workstations:
-                        if d["name"].lower() == ws:
-                            ws_name_lwsid = d["displayValue"]
-                            break
-            finally:
-                ws_name_lwsids.append(ws_name_lwsid)
+                    ws_name_lwsids.append(ws_name_lwsid)
+                for d in workstations:
+                    if d["name"] == ws:
+                        ws_name_lwsid = d["displayValue"]
+                        ws_name_lwsids.append(ws_name_lwsid)
+                        break
+            except:
+                print("failed to get workstation from response...")
     return ws_name_lwsids
+
 
 def format_workstation(ws):
     if type(ws) is str:
