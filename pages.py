@@ -20,6 +20,12 @@ class ExcelPage:
             self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("tab", name=f"{excel_sheet}").click()
         except:
             print("failed to click excel_tab")
+    def set_cell(self, column, row, string: str):
+        self.go_to(column, row)
+        self.page.wait_for_timeout(500)
+        self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.locator("#gridKeyboardContentEditable_textElement").press_sequentially(string)
+        # self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="formula bar").fill(string)
+        # self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="formula bar").fill(string)
 
     def set_task(self, column, row, task):
         task_url = f"https://partnershealthcare.service-now.com/now/nav/ui/classic/params/target/sc_task.do%3Fsys_id%3D{task}"
@@ -31,10 +37,19 @@ class ExcelPage:
             self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.locator("#gridKeyboardContentEditable_textElement").press("ControlOrMeta+k")
             self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Display Text").click()
                 
-        self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Display Text").fill(task)
-        self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Type or paste URL").click()
-        self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Type or paste URL").fill(task_url)
-        self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("button", name="OK").click()
+        try:
+            self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Display Text").fill(task)
+            self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Type or paste URL").click()
+            self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Type or paste URL").fill(task_url)
+            self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("button", name="OK").click()
+        except:
+            try:
+                self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Display Text").fill(task)
+                self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Type or paste URL").click()
+                self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("textbox", name="Type or paste URL").fill(task_url)
+                self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("button", name="OK").click()
+            except:
+                print(f"Couldn't add\nTask URL: {task_url}\nTask: {task}")
 
     def go_to(self, column: str, row: str):
         self.page.locator("iframe[name=\"WacFrame_Excel_0\"]").content_frame.get_by_role("combobox", name="Name Box").click(force=True)
@@ -61,17 +76,50 @@ class SearchPage:
         self.page = page
 
     def load(self):
-        self.page.goto("https://partnershealthcare.service-now.com/esp")
-        self.page.wait_for_url(
-            "https://partnershealthcare.service-now.com/esp", timeout=300000
-        )
-        self.page.get_by_role("link", name="Printer Inventory Have your").click()
+        # self.page.goto("https://partnershealthcare.service-now.com/esp")
+        # self.page.wait_for_url(
+        #     "https://partnershealthcare.service-now.com/esp", timeout=300000
+        # )
+        # self.page.get_by_role("link", name="Printer Inventory Have your").click()
+        self.page.goto("https://partnershealthcare.service-now.com/edm?id=edm_epic_printer_config")
 
     def search(self, control_id, asset_tag):
         self.page.get_by_role("searchbox", name="Type here to search").click()
         self.page.get_by_role("searchbox", name="Type here to search").fill(
             f"{control_id}"
         )
+
+        # entity, room, epic_dep, location = settings 
+        entity = None
+        room = None
+        epic_dep = None
+        location = None
+        try:
+            with self.page.expect_response("https://partnershealthcare.service-now.com/api/now/sp/rectangle/fb6f0bc6476661102a94f147536d431a?id=edm_epic_printer_config", timeout=10000) as response_info:
+                # self.page.get_by_role("searchbox", name="Type here to search").fill(sn)
+                self.page.locator(".div-background > div.div-background > div.panel.panel-default > div.list-group.ng-scope > a > h5").get_by_text(f"{control_id} ({asset_tag})").click()
+                response = response_info.value
+            if response.ok:
+                json = response.json()
+                try:
+                    # data = json["result"]["data"]["epicConfigPrinters"][0]
+                    data: dict = json["result"]["data"]["printerData"]["ec"]
+                    # asset_tag = data["printer.asset_tag"]
+                    # epic_printer = data["epic_printer"]
+                    entity = data.get("current_epic_entity_dv")
+                    room = data.get("current_room_cube")
+                    epic_dep = data.get("current_epic_dep_dv")
+                    location = data.get("current_location_dv")
+                    printer_model = data.get("epic_printer_model_dv")
+                except:
+                    print("Couldn't find in search")
+                    return None
+            else:
+                print(response.status)
+        except:
+            return None
+        return entity, room, epic_dep, location, printer_model
+
         try:
             #xb17afece47ae21102a94f147536d4346 > div > div.div-background > div.panel.panel-default > div:nth-child(4) > a > h5
             #xb17afece47ae21102a94f147536d4346 > div > div.div-background > div.panel.panel-default > div:nth-child(4) > a
@@ -85,6 +133,39 @@ class SearchPage:
                 print("Couldn't find printer search result anchors")
                 print("Make sure all fields are filled out before unpausing")
                 self.page.pause()
+
+    def update_config(self):
+        try:
+            #xfb6f0bc6476661102a94f147536d431a > div > div > div.div-container-no-border > p > input
+            # self.page.locator("div > div > div.div-container-no-border > p > input").click()
+            print("Updating printer configuration...")
+            self.page.get_by_role("button", name="Update Printer Configuration").click(force=True, delay=500)
+            locator = self.page.locator("#uiNotificationContainer > div > span").get_by_text("updated!")
+            locator.wait_for(state="visible")
+            for button in self.page.get_by_role("button", name="Close Notification").all():
+                button.click()
+        except:
+            # print("couldnt wait for config ID invalid reference!")
+            print("Please check order page to ensure that the printer configuration was updated. Press green arrow in debug menu to continue task creation...")
+            self.page.pause()
+
+
+    def fill_epic_dep(self, epic_dep) -> Optional[str]:
+        try:
+            print("Filling Epic DEP...", end=" ", flush=True)
+            self.page.locator("#s2id_epicDepartment > a > span.select2-arrow").click(force=True, timeout=3000)
+            self.page.get_by_role("combobox", name="Epic DEP", exact=True, disabled=False).fill(f"{epic_dep}", timeout=3000)
+            self.page.get_by_role("option", name=f"{epic_dep}").first.click(timeout=3000)
+        except:
+            print(f"Couldn't fill Epic Department combobox: {epic_dep}")
+            self.load()
+            return None
+        else:
+            try:
+                epic_dep = self.page.locator("#select2-chosen-8").inner_text(timeout=1000)
+            finally:
+                print(f"{epic_dep}")
+                return epic_dep
     
     def fill_required_fields(self, control_id, location, room, entity, epic_dep, printer_model) -> dict:
         self.page.wait_for_timeout(2000)

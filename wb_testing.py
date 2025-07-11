@@ -2,8 +2,8 @@ from collections import defaultdict
 from openpyxl import load_workbook
 from mapping import find_printer_tasks
 
-wb = load_workbook("MGH_Label Printer Data Collection Sheet_Logical Mapping-testing2.xlsx")
-sheet_ranges = wb["Data Collection Sheet"]
+# wb = load_workbook("MGH_Label Printer Data Collection Sheet_Logical Mapping-testing2.xlsx")
+# sheet_ranges = wb["Data Collection Sheet"]
 
 
 def find_printer_tasks(control_id_column, task_column, sheet_ranges):
@@ -17,6 +17,10 @@ def find_printer_tasks(control_id_column, task_column, sheet_ranges):
         printer_tasks[control_id] = task
 
     return printer_tasks
+
+tup = ("yes", "location", None)
+if not all(tup):
+    print("THERES A NONE HERE")
 
 
 # print(type(sheet_ranges["P1323"]))

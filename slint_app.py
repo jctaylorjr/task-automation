@@ -34,9 +34,9 @@ class Controller(slint.loader.ui.app_window.MainWindow):
     def attempt_login(self):
         self.write_toml_file()
 
-        self.sharepoint_group = re.search(r"(.*?)\/Shared", self.excel_link).group(1)
+        # self.sharepoint_group = re.search(r"(.*?)\/Shared", self.excel_link).group(1)
         
-        self.excel_file_path = re.search(r"(\/sites\/.*?xlsx)", self.excel_link).group(1)
+        # self.excel_file_path = re.search(r"(\/sites\/.*?xlsx)", self.excel_link).group(1)
 
         # print(f"unqoute: {unquote(self.excel_file_path)}")
         # print(f"unquote plus: {unquote_plus(self.excel_file_path)}")
