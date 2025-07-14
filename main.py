@@ -48,7 +48,7 @@ def main():
 
     # response = File.open_binary(ctx, c.excel_file_path)
     excel_link = "https://partnershealthcare-my.sharepoint.com/:x:/r/personal/ktran36_mgb_org/Documents/Attachments/Net%20New%20Beaker%20Printers_EPRLRS_TASKS_NEEDED.xlsx?d=wa7e951e28f6d4ad0bada14345a7508f5&csf=1&web=1&e=OaLFHw"
-    excel_file = "newbeakers.xlsx"
+    excel_file = "Net New Beaker Printers_EPRLRS_TASKS_NEEDED.xlsx"
     # with open(excel_file, 'wb') as output_file:  
     #     output_file.write(response.content)
 
@@ -90,8 +90,8 @@ def main():
                 print("Control ID None, not int, not length of 6 skipping...")
                 continue
             task = sheet_ranges[f"{c.task_column}{row}"].value
-            # if task is not None:
-            #     continue
+            if task is not None:
+                continue
 
             # workstation = sheet_ranges[f"{c.workstation_column}{row}"].value
             # workstation = format_workstation(workstation)
@@ -135,16 +135,29 @@ def main():
                     print("Failed to get json from printer search")
                     continue
                 # fields = search_page.fill_required_fields(control_id, location, room, entity, epic_dep, printer_model)
-            entity, room, epic_dep, location, printer_model = settings 
+            entity, room, epic_dep, location, epic_printer_model = settings 
 
             update = False
+            fail = False
+            missing = []
             if entity is None or entity == "":
-                print(f"Entity: {entity}, skipping...")
-                continue
-                entity = sheet_ranges[f"{c.entity_column}{row}"].value
+                entity = search_page.fill_epic_entity( sheet_ranges[f"{c.entity_column}{row}"].value)
+                if epic_dep is not None:
+                    update = True
+                else:
+                    fail = True
+                    missing.append("Entity")
             if room is None or room == "":
-                print(f"Room: {room}, skipping...")
-                continue
+                room = sheet_ranges[f"{c.room_column}{row}"].value
+                if room is None or room == "":
+                    room = "FILL IN WHEN FOUND"
+                    missing.append("Room")
+                room = search_page.fill_room(room)
+                if room is not None:
+                    update = True
+                else:
+                    fail = True
+                    missing.append("Room")
                 # room = sheet_ranges[f"{c.room_column}{row}"].value
             if epic_dep is None or epic_dep == "":
                 epic_dep = search_page.fill_epic_dep(sheet_ranges[f"{c.epic_dep_column}{row}"].value)
@@ -152,15 +165,32 @@ def main():
                     update = True
                 else:
                     epic_dep = ""
+                    missing.append("Epic dep")
                 # epic_dep = sheet_ranges[f"{c.epic_dep_column}{row}"].value
-            if location is None or location == "":
-                print(f"Location: {location}, skipping...")
-                continue
-                location = sheet_ranges[f"{c.location_column}{row}"].value
-            if printer_model is None or printer_model == "":
-                print(f"Printer model: {printer_model}, skipping...")
-                continue
+            if location is None or location == "" or location == "MGH/121 Innerbelt Rd./Floor 01":
+                location = search_page.fill_location(sheet_ranges[f"{c.location_column}{row}"].value)
+                if location is not None:
+                    update = True
+                else:
+                    fail = True
+                    missing.append("Location")
+                # location = sheet_ranges[f"{c.location_column}{row}"].value
+            if epic_printer_model is None or epic_printer_model == "":
+                epic_printer_model = match_epic_printer_model(printer_model)
+                if epic_printer_model is not None:
+                    if search_page.fill_epic_printer_model(epic_printer_model) is None:
+                        missing.append("Printer Model")
+                    update = True
+                    printer_model = epic_printer_model
+                else:
+                    fail = True
+                    missing.append("Printer model")
+            else:
+                printer_model = epic_printer_model
 
+            excel_page.set_cell("J", row, f"Missing: {", ".join(missing)}")
+            if fail is True:
+                continue
             if update is True:
                 search_page.update_config()
 
@@ -201,7 +231,7 @@ def main():
             # sheet_ranges[f"{c.epic_dep_column}{row}"] = epic_dep
             excel_page.set_cell(c.room_column, row, room)
             # sheet_ranges[f"{c.room_column}{row}"] = room
-            excel_page.set_cell("H", row, serial_number)
+            excel_page.set_cell("C", row, serial_number)
             # sheet_ranges[f"{"H"}{row}"] = serial_number
             # hostnames = [f"csc{serial_number}", serial_number, f"csc{control_id}"]
             # for hostname in hostnames:
@@ -229,6 +259,21 @@ def main():
 #         self.task = row[f"{task_col}{row}"].value
 #         self.entity = row[f"{entity_col}{row}"].value
 #         self.serial_number
+
+def match_epic_printer_model(printer_model) -> Optional[str]:
+    if "Zebra ZD611" in printer_model:
+        return "Zebra ZD611"
+    elif "Zebra ZQ610" in printer_model:
+        return "Zebra ZQ610 (Wireless)"
+    elif "Zebra ZD621" in printer_model:
+        return "Zebra ZD621"
+    elif "Zebra Z410" in printer_model:
+        return "Zebra ZD410"
+    elif "Zebra ZD620" in printer_model:
+        return "Zebra ZD620"
+    else:
+        print(f"Unknown: {printer_model}")
+        return None
 
 def resolve_hostname(hostname: str) -> Optional[tuple]:
     try:

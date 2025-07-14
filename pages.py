@@ -149,8 +149,21 @@ class SearchPage:
             print("Please check order page to ensure that the printer configuration was updated. Press green arrow in debug menu to continue task creation...")
             self.page.pause()
 
+    def fill_room(self, room) -> Optional[str]:
+        try:
+            print("Filling Room/Cube...", end=" ", flush=True)
+            self.page.get_by_role("textbox", name="*Room/Cube").click(force=True)
+            self.page.get_by_role("textbox", name="*Room/Cube", disabled=False).fill(f"{room}")
+            print(room)
+        except:
+            return None
+        else:
+            return room
 
     def fill_epic_dep(self, epic_dep) -> Optional[str]:
+        if epic_dep is None or epic_dep == "":
+            return None
+        epic_dep = epic_dep.strip()
         try:
             print("Filling Epic DEP...", end=" ", flush=True)
             self.page.locator("#s2id_epicDepartment > a > span.select2-arrow").click(force=True, timeout=3000)
@@ -158,14 +171,75 @@ class SearchPage:
             self.page.get_by_role("option", name=f"{epic_dep}").first.click(timeout=3000)
         except:
             print(f"Couldn't fill Epic Department combobox: {epic_dep}")
-            self.load()
+            self.page.locator("#s2id_epicDepartment > a > span.select2-arrow").click(force=True, timeout=3000)
             return None
         else:
             try:
                 epic_dep = self.page.locator("#select2-chosen-8").inner_text(timeout=1000)
             finally:
-                print(f"{epic_dep}")
+                print(epic_dep)
                 return epic_dep
+
+    def fill_epic_entity(self, epic_entity) -> Optional[str]:
+        if epic_entity is None or epic_entity == "":
+            return None
+        epic_entity = epic_entity.strip()
+        try:
+            print("Filling Epic Entity...", end=" ", flush=True)
+            self.page.locator("#s2id_epicEntity > a > span.select2-arrow").click(force=True, timeout=3000)
+            self.page.get_by_role("combobox", name="*Epic Entity", exact=True, disabled=False).fill(f"{epic_entity}", timeout=3000)
+            self.page.get_by_role("option", name=f"{epic_entity}").first.click(timeout=3000)
+        except:
+            print(f"Couldn't fill Epic entity combobox: {epic_entity}")
+            self.page.locator("#s2id_epicEntity > a > span.select2-arrow").click(force=True, timeout=3000)
+            return None
+        else:
+            try:
+                entity = self.page.locator("#select2-chosen-6").inner_text(timeout=1000)
+            finally:
+                print(entity)
+                return epic_entity
+
+    def fill_epic_printer_model(self, printer_model) -> Optional[str]:
+        if printer_model is None or printer_model == "":
+            return None
+        printer_model = printer_model.strip()
+        try:
+            print("Filling Epic Printer Model...", end=" ", flush=True)
+            self.page.locator("#s2id_epicModel > a > span.select2-arrow").click(force=True, timeout=3000)
+            self.page.get_by_role("combobox", name="*Epic Printer Model", exact=True, disabled=False).fill(f"{printer_model}", timeout=3000)
+            self.page.get_by_role("option", name=f"{printer_model}").first.click(timeout=3000)
+        except:
+            print(f"Couldn't fill printer model combobox: {printer_model}")
+            self.page.locator("#s2id_location > a > span.select2-arrow").click(force=True)
+            return None
+        else:
+            try:
+                printer_model = self.page.locator("#select2-chosen-9").inner_text(timeout=1000)
+            finally:
+                print(printer_model)
+                return printer_model
+
+    def fill_location(self, location) -> Optional[str]:
+        if location is None or location == "":
+            return None
+        location = location.strip()
+        try:
+            print("Filling location...", end=" ", flush=True)
+            self.page.locator("#s2id_location > a > span.select2-arrow").click(force=True, timeout=3000)
+            self.page.get_by_role("combobox", name="*Location", exact=True, disabled=False).fill(f"{location}", timeout=3000)
+            self.page.get_by_role("option", name=f"{location}").first.click()
+        except:
+            print(f"Couldn't fill Location combobox: {location}")
+            self.page.locator("#s2id_location > a > span.select2-arrow").click(force=True)
+            return None
+        else:
+            try:
+                location = self.page.locator("#select2-chosen-4").inner_text(timeout=1000)
+            finally:
+                print(location)
+                return location
+        
     
     def fill_required_fields(self, control_id, location, room, entity, epic_dep, printer_model) -> dict:
         self.page.wait_for_timeout(2000)
